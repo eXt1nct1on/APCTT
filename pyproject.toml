@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trl-scout"
+version = "0.1.0"
+description = "Technology Readiness Level assessment system"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "PyMuPDF>=1.23,<2",
+    "pdfplumber>=0.10,<1",
+    "pytesseract>=0.3.10,<1",
+    "python-docx>=1.1,<2",
+    "spacy>=3.7,<4",
+    "rank-bm25>=0.2,<1",
+    "sentence-transformers>=2.6,<4",
+    "rapidfuzz>=3.6,<4",
+    "litellm>=1.40,<2",
+    "pydantic>=2.6,<3",
+    "pydantic-settings>=2.2,<3",
+    "fastapi>=0.110,<1",
+    "sse-starlette>=2,<3",
+    "uvicorn[standard]>=0.29,<1",
+    "streamlit>=1.32,<2",
+    "plotly>=5.20,<6",
+    "jinja2>=3.1,<4",
+    "weasyprint>=61,<70",
+    "matplotlib>=3.8,<4",
+    "pandas>=2.2,<3",
+    "scikit-learn>=1.4,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+    "ruff>=0.4,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "live: tests requiring live API access",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "api", "app", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+

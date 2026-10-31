@@ -1,0 +1,1 @@
+"""Assessment narration pipeline step."""
