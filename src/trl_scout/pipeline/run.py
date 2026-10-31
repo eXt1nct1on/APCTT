@@ -353,25 +353,6 @@ def assess(
         logger.exception("Summary narration failed")
         emit("summary", "failed", "Using concise fallback summary.")
 
-    emit("report", "started", "Checking report generation support.")
-    report_result: dict[str, Any] = {
-        "status": "skipped",
-        "reason": "Report builder is not available yet.",
-    }
-    try:
-        from trl_scout.report.builder import build_report
-    except ImportError:
-        build_report = None
-    if callable(build_report):
-        try:
-            report_result = {"status": "completed", "output": build_report}
-        except Exception as exc:
-            flags.append("report_failed")
-            report_result = {"status": "failed", "error": str(exc)}
-            logger.exception("Report generation failed")
-    _write_step(run_dir, "report", report_result)
-    emit("report", report_result["status"], str(report_result.get("reason", "Report complete.")))
-
     flags = sorted(set([*flags, *verdict.flags]))
     verdict = verdict.model_copy(update={"flags": flags})
     stats = client.stats.model_copy(
@@ -394,6 +375,24 @@ def assess(
         stats=stats,
     )
     _write_step(run_dir, "assessment", assessment)
+    emit("report", "started", "Building the assessment report.")
+    try:
+        from trl_scout.report.builder import build_report
+
+        report_path = build_report(assessment, run_dir / "report.pdf")
+        report_result = {"status": "completed", "output": str(report_path)}
+        emit("report", "completed", f"Report saved to {report_path}.")
+    except Exception as exc:
+        flags.append("report_failed")
+        report_result = {"status": "failed", "error": str(exc)}
+        logger.exception("Report generation failed")
+        emit("report", "failed", "Assessment report generation failed.")
+    if "report_failed" in flags:
+        assessment = assessment.model_copy(
+            update={"flags": sorted(set([*assessment.flags, "report_failed"]))}
+        )
+        _write_step(run_dir, "assessment", assessment)
+    _write_step(run_dir, "report", report_result)
     return assessment
 
 

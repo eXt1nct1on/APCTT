@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>TRL-Scout report - {{ assessment.tech.name }}</title>
+  <style>{{ css }}</style>
+</head>
+<body>
+  <header class="header">
+    <div class="eyebrow">Technology readiness assessment</div>
+    <h1>{{ document_title }}</h1>
+    <div class="meta">{{ assessment.tech.name }} &middot; {{ assessment.created_at.strftime("%Y-%m-%d") }} &middot; Run {{ assessment.run_id }}</div>
+  </header>
+
+  <section class="verdict">
+    <div class="verdict-grid">
+      <div class="trl"><small>TRL</small>{{ assessment.verdict.trl }}</div>
+      <div class="confidence">
+        <strong>Readiness range: TRL {{ assessment.verdict.range_low }}-{{ assessment.verdict.range_high }}</strong>
+        <div class="bar"><span style="width: {{ confidence_percent }}%"></span></div>
+        <span class="muted">Confidence {{ "%.0f"|format(confidence_percent) }}%</span>
+      </div>
+    </div>
+    <p><strong>Reason:</strong> {{ assessment.verdict.reasoning }}</p>
+  </section>
+
+  <section>
+    <h2>Executive summary</h2>
+    <p>{{ assessment.summary.text }}</p>
+    <div class="grid">
+      <div class="card"><strong>Key takeaways</strong><ul>{% for item in assessment.summary.key_takeaways %}<li>{{ item }}</li>{% endfor %}</ul></div>
+      <div class="card"><strong>Caveats</strong><ul>{% for item in assessment.summary.caveats %}<li>{{ item }}</li>{% endfor %}</ul></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Technology profile</h2>
+    <div class="grid">
+      <div><strong>Domain</strong><p>{{ assessment.tech.domain }}</p><strong>Application</strong><p>{{ assessment.tech.intended_application }}</p></div>
+      <div><strong>Components</strong><ul>{% for item in assessment.tech.key_components %}<li>{{ item }}</li>{% endfor %}</ul><strong>Author-stated maturity</strong><p>{{ assessment.tech.author_stated_maturity or "Not stated" }}</p></div>
+    </div>
+    {% if assessment.tech.claimed_results %}<h3>Claimed results</h3><table><tr><th>Metric</th><th>Value</th><th>Conditions</th></tr>{% for result in assessment.tech.claimed_results %}<tr><td>{{ result.metric }}</td><td>{{ result.value }}</td><td>{{ result.conditions }}</td></tr>{% endfor %}</table>{% endif %}
+  </section>
+
+  <section>
+    <h2>TRL ladder</h2>
+    <img alt="Nine-step TRL ladder" src="{{ ladder_chart }}" style="width:100%">
+  </section>
+
+  <section class="page-break">
+    <h2>Evidence by level</h2>
+    {% for level, items in evidence_by_level.items() %}
+    <h3>TRL {{ level }}</h3>
+    <table><tr><th>Criterion</th><th>Quote</th><th>Page</th><th>Polarity</th><th>Attribution</th><th>Verified</th></tr>
+    {% for item in items %}<tr><td>{{ item.criterion_id }}</td><td class="quote">{{ item.quote }}</td><td>{{ item.page }}</td><td><span class="badge {{ item.polarity }}">{{ item.polarity }}</span></td><td>{{ item.attribution }}</td><td class="{{ 'verified' if item.verified else 'unverified' }}">{{ "&#10003;" if item.verified else "&#10007;" }}</td></tr>{% endfor %}
+    </table>
+    {% endfor %}
+  </section>
+
+  <section>
+    <h2>What is missing for TRL {{ assessment.gaps.target_trl }}</h2>
+    <p>{{ assessment.gaps.headline }}</p>
+    <table><tr><th>Criterion</th><th>Missing</th><th>Done when</th><th>Effort</th><th>Priority</th></tr>
+    {% for item in assessment.gaps.items %}{% for action in item.actions %}<tr><td>{{ item.criterion_id }}</td><td>{{ item.missing }}<br><span class="muted small">{{ item.why_it_matters }}</span></td><td>{{ action.done_when }}</td><td>{{ action.effort }}<br><span class="muted small">{{ action.typical_duration }}</span></td><td>{{ item.priority }}</td></tr>{% endfor %}{% endfor %}
+    </table>
+  </section>
+
+  <section>
+    <h2>Recommended roadmap</h2>
+    <div class="roadmap">{% for phase in ["now", "next", "later"] %}<div><h3>{{ phase|capitalize }}</h3><ul>{% for action in assessment.gaps.roadmap.get(phase, []) %}<li>{{ action }}</li>{% endfor %}</ul></div>{% endfor %}</div>
+  </section>
+
+  <section>
+    <h2>Risks and assumptions</h2>
+    <div class="grid"><div><h3>Risks</h3><ul>{% for item in assessment.gaps.risks %}<li>{{ item }}</li>{% endfor %}</ul></div><div><h3>Assumptions</h3><ul>{% for item in assessment.gaps.assumptions %}<li>{{ item }}</li>{% endfor %}</ul></div></div>
+  </section>
+
+  <section>
+    <h2>Method and limitations</h2>
+    <p>The score is computed from verified evidence mapped to the nine-level TRL rubric. Criterion scores are averaged into level scores; the rule-based result is combined with up to three independent LLM judge votes. Only evidence verified against this document is used for scoring.</p>
+    <p><strong>LLM calls used:</strong> {{ assessment.stats.llm_calls }} &middot; <strong>Runtime:</strong> {{ "%.2f"|format(assessment.stats.seconds) }} seconds</p>
+    <p class="muted"><em>Estimate based on this document only. It is not a certification or independent field validation.</em></p>
+  </section>
+
+  <section class="appendix page-break">
+    <h2>Appendix: audit trail</h2>
+    <h3>Author-stated TRL mentions</h3><ul>{% for item in assessment.author_stated_trl_mentions %}<li>{{ item }}</li>{% else %}<li>None recorded.</li>{% endfor %}</ul>
+    <h3>Flags</h3><ul>{% for item in assessment.flags %}<li>{{ item }}</li>{% else %}<li>None.</li>{% endfor %}</ul>
+    <h3>Audit-trail pointers</h3><p>Run ID: <code>{{ assessment.run_id }}</code>. Per-step JSON outputs and run.log are stored under the run directory associated with this assessment.</p>
+  </section>
+</body>
+</html>
