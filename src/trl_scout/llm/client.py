@@ -151,7 +151,7 @@ class LLMClient:
     def _retryable(exc: Exception) -> bool:
         """Identify transient provider failures."""
         text = str(exc).lower()
-        return any(
+        return isinstance(exc, (TimeoutError, asyncio.TimeoutError)) or any(
             token in text for token in ("429", "timeout", "timed out", "500", "502", "503", "504")
         )
 

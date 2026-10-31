@@ -66,3 +66,5 @@ def test_upload_size_and_type_limits(tmp_path: Path) -> None:
             files={"file": ("paper.exe", b"bad", "application/octet-stream")},
         )
         assert bad_type.status_code == 415
+    runs_dir = tmp_path / "data" / "runs"
+    assert not runs_dir.exists() or not any(runs_dir.iterdir())

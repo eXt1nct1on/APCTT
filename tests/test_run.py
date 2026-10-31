@@ -40,9 +40,15 @@ def _pdf(path: Path) -> None:
     """Create a small source PDF."""
     document = canvas.Canvas(str(path))
     document.drawString(72, 760, "Abstract")
-    document.drawString(72, 740, "A laboratory battery prototype is described.")
+    text = document.beginText(72, 740)
+    for _ in range(18):
+        text.textLine("A laboratory battery prototype is described with repeated battery testing.")
+    document.drawText(text)
     document.drawString(72, 700, "Results")
-    document.drawString(72, 680, "Measured capacity reached 100 mAh after cycling.")
+    text = document.beginText(72, 680)
+    for _ in range(18):
+        text.textLine("Measured capacity reached 100 mAh after cycling and repeated measurement.")
+    document.drawText(text)
     document.save()
 
 

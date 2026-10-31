@@ -21,6 +21,7 @@ from docx import Document as DocxDocument
 from trl_scout.config import settings
 from trl_scout.ingest.chunker import chunk_sections, clean_pages
 from trl_scout.ingest.sections import detect_doc_type, detect_sections
+from trl_scout.pipeline.hardening import detect_language
 from trl_scout.schemas import Document
 
 logger = logging.getLogger("trl_scout.ingest")
@@ -43,11 +44,12 @@ def _normalise_pages(pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return clean_pages(pages)
 
 
-def _pdf_pages(content: bytes) -> tuple[list[dict[str, Any]], list[int]]:
+def _pdf_pages(content: bytes) -> tuple[list[dict[str, Any]], list[int], list[float]]:
     """Extract PDF pages, font sizes, OCR fallbacks, and table blocks."""
     pdf = fitz.open(stream=content, filetype="pdf")
     pages: list[dict[str, Any]] = []
     ocr_pages: list[int] = []
+    ocr_confidences: list[float] = []
     for page_number, page in enumerate(pdf, 1):
         lines: list[dict[str, Any]] = []
         for block in page.get_text("dict")["blocks"]:
@@ -70,11 +72,23 @@ def _pdf_pages(content: bytes) -> tuple[list[dict[str, Any]], list[int]]:
 
                 pixmap = page.get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False)
                 image = Image.open(io.BytesIO(pixmap.tobytes("png")))
+                data = pytesseract.image_to_data(image, output_type=pytesseract.Output.DICT)
+                confidence_values = [
+                    float(value)
+                    for value, word in zip(data.get("conf", []), data.get("text", []), strict=False)
+                    if word.strip() and float(value) >= 0
+                ]
+                confidence = (
+                    sum(confidence_values) / len(confidence_values) / 100
+                    if confidence_values
+                    else 0.0
+                )
                 text = pytesseract.image_to_string(image).strip()
                 if text:
                     lines = [{"text": text, "font_size": 0}]
                     ocr_pages.append(page_number)
-            except (ImportError, OSError) as exc:
+                    ocr_confidences.append(confidence)
+            except (ImportError, OSError, RuntimeError) as exc:
                 logger.warning("OCR unavailable for PDF page %s: %s", page_number, exc)
         pages.append({"page": page_number, "lines": lines})
     try:
@@ -92,7 +106,7 @@ def _pdf_pages(content: bytes) -> tuple[list[dict[str, Any]], list[int]]:
                         )
     except (OSError, ValueError) as exc:
         logger.warning("Could not extract PDF tables: %s", exc)
-    return pages, ocr_pages
+    return pages, ocr_pages, ocr_confidences
 
 
 def _docx_pages(content: bytes) -> list[dict[str, Any]]:
@@ -157,14 +171,18 @@ def load_document(source: str | Path) -> Document:
     """Load and chunk a document from a path, URL, arXiv identifier, or raw text."""
     content, suffix, filename = _source_bytes(source)
     if suffix == ".pdf":
-        pages, ocr_pages = _pdf_pages(content)
+        pages, ocr_pages, ocr_confidences = _pdf_pages(content)
     elif suffix == ".docx":
-        pages, ocr_pages = _docx_pages(content), []
+        pages, ocr_pages, ocr_confidences = _docx_pages(content), [], []
     elif suffix in {".txt", ".md"}:
-        pages, ocr_pages = _text_pages(content.decode("utf-8", errors="replace")), []
+        pages, ocr_pages, ocr_confidences = (
+            _text_pages(content.decode("utf-8", errors="replace")),
+            [],
+            [],
+        )
     elif suffix == ".html":
         soup = BeautifulSoup(content, "html.parser")
-        pages, ocr_pages = _text_pages(soup.get_text("\n")), []
+        pages, ocr_pages, ocr_confidences = _text_pages(soup.get_text("\n")), [], []
     else:
         raise ValueError(f"unsupported document type: {suffix}")
     pages = _normalise_pages(pages)
@@ -175,6 +193,10 @@ def load_document(source: str | Path) -> Document:
     meta = {
         "pages": pages,
         "ocr_pages": ocr_pages,
+        "ocr_confidence": (
+            sum(ocr_confidences) / len(ocr_confidences) if ocr_confidences else None
+        ),
+        "language": detect_language(all_text),
         "sections": [{"section": block["section"], "page": block["page"]} for block in blocks],
     }
     return Document(

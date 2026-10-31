@@ -24,6 +24,12 @@ from trl_scout.llm.client import FakeLLM, LLMClient
 from trl_scout.logging_utils import configure_logging
 from trl_scout.pipeline.evidence import assess_evidence
 from trl_scout.pipeline.gaps import build_gap_analysis
+from trl_scout.pipeline.hardening import (
+    bound_document,
+    detect_language,
+    detect_prompt_injection,
+    redact_prompt_injection,
+)
 from trl_scout.pipeline.identify import identify_technology
 from trl_scout.pipeline.narrate import narrate_summary
 from trl_scout.pipeline.score import calculate_level_scores, score_document
@@ -35,6 +41,7 @@ from trl_scout.schemas import (
     EvidenceItem,
     GapAnalysis,
     ProgressEvent,
+    RunStats,
     Summary,
     TechProfile,
     TRLVerdict,
@@ -113,6 +120,68 @@ def _fallback_summary(verdict: TRLVerdict) -> Summary:
         key_takeaways=[f"Assigned TRL: {verdict.trl}."],
         caveats=["Executive narration was unavailable."],
     )
+
+
+def _insufficient_assessment(
+    document: Document,
+    run_id: str,
+    flags: list[str],
+    run_dir: Path,
+    started: float,
+) -> Assessment:
+    """Return a complete, transparent result for documents with too little text."""
+    levels = calculate_level_scores([], [])
+    verdict = TRLVerdict(
+        trl=1,
+        range_low=1,
+        range_high=1,
+        confidence=0,
+        votes={"rule": 1, "judge": [], "confidence_label": "Low"},
+        reasoning="The document contains insufficient text for a readiness assessment.",
+        decisive_evidence_ids=[],
+        contradictions=[],
+        flags=sorted(set([*flags, "insufficient_text"])),
+    )
+    tech = _fallback_tech(document)
+    gaps = _fallback_gaps(verdict)
+    summary = Summary(
+        text="The document is too short to support a reliable assessment.",
+        key_takeaways=["Provide at least 300 words of technical evidence."],
+        caveats=["No LLM analysis was performed because the input was too small."],
+    )
+    assessment = Assessment(
+        run_id=run_id,
+        created_at=datetime.now(UTC),
+        is_example=False,
+        source=document.filename,
+        tech=tech,
+        verdict=verdict,
+        levels=levels,
+        evidence=[],
+        gaps=gaps,
+        summary=summary,
+        author_stated_trl_mentions=[],
+        planned_items=[],
+        flags=verdict.flags,
+        stats=RunStats(
+            llm_calls=0,
+            cache_hits=0,
+            tokens_in=0,
+            tokens_out=0,
+            seconds=time.perf_counter() - started,
+        ),
+    )
+    for step, value in {
+        "identify": {"status": "skipped", "reason": "insufficient_text"},
+        "evidence": {"status": "skipped", "reason": "insufficient_text"},
+        "verify": {"status": "skipped", "reason": "insufficient_text"},
+        "score": {"verdict": verdict, "levels": levels},
+        "gaps": gaps,
+        "summary": summary,
+    }.items():
+        _write_step(run_dir, step, value)
+    _write_step(run_dir, "assessment", assessment)
+    return assessment
 
 
 class _MockCompletion(FakeLLM):
@@ -226,11 +295,32 @@ def assess(
     emit("ingest", "started", "Loading source document.")
     try:
         document = load_document(source)
+        if detect_prompt_injection(document.chunks):
+            flags.append("possible_prompt_injection")
+            document = redact_prompt_injection(document)
+        language = str(document.meta.get("language") or "")
+        if not language:
+            language = detect_language(" ".join(chunk.text for chunk in document.chunks))
+            document = document.model_copy(update={"meta": {**document.meta, "language": language}})
+        if language != "en":
+            flags.append("non_english_document")
+        document, was_bounded = bound_document(document)
+        if was_bounded:
+            flags.append("long_document")
+        ocr_confidence = document.meta.get("ocr_confidence")
+        if ocr_confidence is not None and float(ocr_confidence) < 0.5:
+            flags.append("low_ocr_confidence")
         _write_step(run_dir, "ingest", document)
         emit("ingest", "completed", f"Loaded {document.n_pages} page(s).")
     except Exception as exc:
         emit("ingest", "failed", str(exc))
         raise
+
+    if sum(len(chunk.text.split()) for chunk in document.chunks) < 300:
+        flags.append("insufficient_text")
+        assessment = _insufficient_assessment(document, run_id, flags, run_dir, started)
+        emit("report", "completed", "Skipped report generation for insufficient text.")
+        return assessment
 
     emit("index", "started", "Building document index.")
     try:

@@ -55,6 +55,28 @@ def test_fallback_switch() -> None:
     assert calls == ["primary", "fallback"]
 
 
+def test_timeout_switches_to_fallback() -> None:
+    """Timeout exceptions are retried through the configured fallback."""
+    calls: list[str] = []
+
+    def backend(**kwargs):
+        calls.append(kwargs["model"])
+        if kwargs["model"] == "primary":
+            raise TimeoutError()
+        return {"choices": [{"message": {"content": '{"ok": true}'}}]}
+
+    client = LLMClient(
+        completion=backend,
+        model="primary",
+        fallback_model="fallback",
+        cache=JsonCache("data-test-timeout", enabled=False),
+        max_retries=0,
+        backoff_seconds=0,
+    )
+    assert client.complete_json("system", "user", Result).ok
+    assert calls == ["primary", "fallback"]
+
+
 def test_gather_limited() -> None:
     """The semaphore prevents more than the configured concurrent tasks."""
     active = 0

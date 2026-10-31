@@ -50,6 +50,7 @@ class ScoringConfig(BaseSettings):
     evidence_factor_cap: int = Field(6, gt=0)
     patent_no_examples_factor: float = Field(0.80, ge=0, le=1)
     ocr_factor: float = Field(0.90, ge=0, le=1)
+    low_ocr_factor: float = Field(0.60, ge=0, le=1)
     ocr_page_fraction: float = Field(0.30, ge=0, le=1)
 
 

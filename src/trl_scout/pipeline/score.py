@@ -204,6 +204,9 @@ def _confidence(
     ocr_pages = len(meta.get("ocr_pages", []) or [])
     if pages and ocr_pages / pages > config.ocr_page_fraction:
         factor *= config.ocr_factor
+    ocr_confidence = meta.get("ocr_confidence")
+    if ocr_confidence is not None and float(ocr_confidence) < 0.5:
+        factor *= config.low_ocr_factor
     confidence = agreement * factor
     label = "Low" if confidence < 0.45 else "Medium" if confidence < 0.75 else "High"
     return confidence, label

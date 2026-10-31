@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+import shutil
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -243,6 +244,7 @@ async def create_assessment(request: Request) -> dict[str, str]:
             )
     except HTTPException:
         app.state.runs.pop(run_id, None)
+        shutil.rmtree(run_dir, ignore_errors=True)
         raise
     return {"run_id": run_id}
 
