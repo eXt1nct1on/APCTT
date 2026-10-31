@@ -30,3 +30,12 @@ make run-api
 
 It exposes `/docs`, asynchronous assessment status and SSE progress events,
 plus run-scoped assessment and report downloads.
+
+The Streamlit UI can be started with:
+
+```text
+make run-ui
+```
+
+Enable **Demo mode** in the sidebar for an instant, deterministic example
+assessment without making LLM calls.
