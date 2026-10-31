@@ -19,6 +19,7 @@ dependencies = [
     "litellm>=1.40,<2",
     "pydantic>=2.6,<3",
     "pydantic-settings>=2.2,<3",
+    "PyYAML>=6,<7",
     "fastapi>=0.110,<1",
     "sse-starlette>=2,<3",
     "uvicorn[standard]>=0.29,<1",
@@ -54,7 +55,9 @@ src = ["src", "api", "app", "tests"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["trl_scout"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-

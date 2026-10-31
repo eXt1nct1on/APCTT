@@ -1,0 +1,106 @@
+levels:
+  - level: 1
+    name: Basic principles observed
+    criteria:
+      - id: T1.1
+        text: A scientific principle, phenomenon or theoretical basis relevant to the technology is described or reported.
+        hints: [scientific principle, phenomenon, theoretical basis, mechanism, theory]
+      - id: T1.2
+        text: Potential relevance to a technology or application area is discussed.
+        hints: [potential relevance, application area, technology opportunity, use case, potential application]
+  - level: 2
+    name: Technology concept formulated
+    criteria:
+      - id: T2.1
+        text: A specific technology concept or application is formulated (design, architecture, material or process).
+        hints: [technology concept, design, architecture, material, process, formulated]
+      - id: T2.2
+        text: Analysis, modelling or simulation supports the feasibility of the concept.
+        hints: [analysis, modelling, simulation, feasibility, model, computational]
+      - id: T2.3
+        text: Expected performance or benefits are stated, at least qualitatively.
+        hints: [expected performance, expected benefits, projected, anticipated, qualitative]
+  - level: 3
+    name: Experimental proof of concept
+    criteria:
+      - id: T3.1
+        text: A laboratory experiment demonstrates the key function of the concept.
+        hints: [laboratory experiment, demonstrates, key function, proof of concept, experimental]
+      - id: T3.2
+        text: Measured (not only simulated) data are reported for the core function.
+        hints: [measured data, experimental data, measured, core function, results, observation]
+      - id: T3.3
+        text: Work is done on individual components or small bench-scale samples.
+        hints: [individual component, bench-scale, small sample, laboratory sample, component-level]
+  - level: 4
+    name: Technology validated in laboratory
+    criteria:
+      - id: T4.1
+        text: Several components or subsystems are integrated and tested together in the laboratory.
+        hints: [integrated, subsystem, components, assembled, laboratory test, system integration]
+      - id: T4.2
+        text: Quantitative performance metrics are reported under controlled conditions, with a baseline or target.
+        hints: [quantitative metrics, controlled conditions, baseline, target, performance metric, benchmark]
+      - id: T4.3
+        text: Repeatability is shown (multiple samples or runs, statistics, stability tests).
+        hints: [repeatability, multiple samples, multiple runs, statistics, stability test, reproducibility]
+  - level: 5
+    name: Technology validated in relevant environment
+    criteria:
+      - id: T5.1
+        text: Testing is done in a relevant environment (realistic conditions such as temperature, load, duration, contaminants).
+        hints: [relevant environment, realistic conditions, temperature, load, duration, contaminants]
+      - id: T5.2
+        text: A scaled-up or breadboard assembly with realistic interfaces or subsystems is tested.
+        hints: [scaled-up, breadboard, realistic interfaces, assembly, subsystem, scale-up]
+      - id: T5.3
+        text: Performance is compared with application requirements or specifications, not only lab baselines.
+        hints: [application requirements, specifications, compared, required performance, acceptance criteria]
+  - level: 6
+    name: Technology demonstrated in relevant environment
+    criteria:
+      - id: T6.1
+        text: A representative prototype (system or subsystem) is demonstrated end to end in a relevant environment.
+        hints: [representative prototype, end to end, relevant environment, demonstrated, prototype system]
+      - id: T6.2
+        text: Prototype performance is measured against requirements, including reliability or durability over a meaningful time.
+        hints: [prototype performance, requirements, reliability, durability, long-term, meaningful time]
+      - id: T6.3
+        text: The prototype is at pilot scale or in near-final form, fit and function.
+        hints: [pilot scale, near-final, fit and function, pilot prototype, final form]
+  - level: 7
+    name: System prototype demonstrated operationally
+    criteria:
+      - id: T7.1
+        text: A system prototype is demonstrated in the real operational environment (field trial, flight test, pilot plant, in service).
+        hints: [operational environment, field trial, flight test, pilot plant, in service, real-world]
+      - id: T7.2
+        text: Real users or operators, or real inputs, are involved, not only the developers.
+        hints: [real users, operators, real inputs, end users, customer trial, operational staff]
+      - id: T7.3
+        text: Operational performance data and issues are collected and the design is largely frozen.
+        hints: [operational data, performance issues, field data, design frozen, lessons learned, deployment]
+  - level: 8
+    name: System complete and qualified
+    criteria:
+      - id: T8.1
+        text: The system is complete and qualified through formal tests, certification or standards compliance.
+        hints: [formal tests, qualified, certification, standards compliance, qualification]
+      - id: T8.2
+        text: Manufacturing or production processes, documentation, maintenance and safety cases are demonstrated or ready.
+        hints: [manufacturing, production process, documentation, maintenance, safety case, production-ready]
+      - id: T8.3
+        text: Required regulatory approvals are obtained.
+        hints: [regulatory approval, approval obtained, regulator, authorization, compliance approval]
+  - level: 9
+    name: Actual system proven in operational environment
+    criteria:
+      - id: T9.1
+        text: The system is deployed and operating in real missions or the market over a sustained period.
+        hints: [deployed, operating, real missions, market, sustained period, in operation]
+      - id: T9.2
+        text: Commercial sales, fielded units or an operational track record with measured outcomes exist.
+        hints: [commercial sales, fielded units, operational track record, measured outcomes, customers]
+      - id: T9.3
+        text: In-service support and field reliability data exist.
+        hints: [in-service support, field reliability, maintenance records, service data, reliability data]

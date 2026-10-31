@@ -1,0 +1,278 @@
+{
+  "run_id": "example-battery-001",
+  "created_at": "2026-10-31T12:00:00Z",
+  "is_example": true,
+  "source": "invented_battery_research_paper.pdf",
+  "tech": {
+    "name": "Silicon-graphite composite anode for lithium-ion batteries",
+    "domain": "Energy storage",
+    "doc_type": "research_paper",
+    "summary": "A porous silicon-graphite composite anode intended to increase lithium-ion battery capacity while limiting silicon expansion.",
+    "intended_application": "High-energy lithium-ion cells for portable electronics and electric mobility.",
+    "key_components": [
+      "Porous silicon particles",
+      "Graphite matrix",
+      "Carbon binder",
+      "Coin-cell test assembly"
+    ],
+    "claimed_results": [
+      {
+        "metric": "Initial reversible capacity",
+        "value": "1,420 mAh/g",
+        "conditions": "0.1C in half-cell coin cells"
+      },
+      {
+        "metric": "Capacity retention",
+        "value": "82% after 200 cycles",
+        "conditions": "1C cycling at room temperature"
+      }
+    ],
+    "author_stated_maturity": "Laboratory-scale validation",
+    "keywords": ["silicon graphite anode", "porous silicon", "lithium-ion battery", "capacity retention"]
+  },
+  "verdict": {
+    "trl": 4,
+    "range_low": 4,
+    "range_high": 4,
+    "confidence": 0.84,
+    "votes": {
+      "rule": 4,
+      "judge": [4, 4, 4]
+    },
+    "reasoning": "The authors integrate the composite anode into laboratory coin cells and report quantitative cycling results with a graphite baseline. Repeat testing supports laboratory validation, but no relevant-environment or scaled assembly evidence is shown.",
+    "decisive_evidence_ids": ["E001", "E003", "E005", "E006"],
+    "contradictions": [],
+    "flags": ["No pouch-cell or module-scale demonstration"]
+  },
+  "levels": [
+    {
+      "level": 1,
+      "score": 1.0,
+      "criteria": [
+        {"criterion_id": "T1.1", "status": "met", "evidence_ids": ["E001"], "score": 1.0, "note": "Silicon alloying and expansion mechanism are described."},
+        {"criterion_id": "T1.2", "status": "met", "evidence_ids": ["E002"], "score": 1.0, "note": "The paper identifies high-energy cells as the application."}
+      ]
+    },
+    {
+      "level": 2,
+      "score": 1.0,
+      "criteria": [
+        {"criterion_id": "T2.1", "status": "met", "evidence_ids": ["E002"], "score": 1.0, "note": "The composite anode architecture is specified."},
+        {"criterion_id": "T2.2", "status": "met", "evidence_ids": ["E003"], "score": 1.0, "note": "A diffusion model supports the pore design."},
+        {"criterion_id": "T2.3", "status": "met", "evidence_ids": ["E002"], "score": 1.0, "note": "Higher capacity and reduced expansion are expected benefits."}
+      ]
+    },
+    {
+      "level": 3,
+      "score": 1.0,
+      "criteria": [
+        {"criterion_id": "T3.1", "status": "met", "evidence_ids": ["E004"], "score": 1.0, "note": "Coin-cell experiments demonstrate charge storage."},
+        {"criterion_id": "T3.2", "status": "met", "evidence_ids": ["E005"], "score": 1.0, "note": "Measured capacity and cycling data are reported."},
+        {"criterion_id": "T3.3", "status": "met", "evidence_ids": ["E004"], "score": 1.0, "note": "The work uses small laboratory cells."}
+      ]
+    },
+    {
+      "level": 4,
+      "score": 0.92,
+      "criteria": [
+        {"criterion_id": "T4.1", "status": "met", "evidence_ids": ["E004"], "score": 1.0, "note": "Anode, electrolyte, separator and cathode are tested together."},
+        {"criterion_id": "T4.2", "status": "met", "evidence_ids": ["E005", "E006"], "score": 1.0, "note": "Quantitative cycling is compared with graphite."},
+        {"criterion_id": "T4.3", "status": "partial", "evidence_ids": ["E007"], "score": 0.75, "note": "Three cells are tested, but uncertainty statistics are limited."}
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E001",
+      "criterion_id": "T1.1",
+      "chunk_id": "c01",
+      "page": 1,
+      "quote": "Silicon stores lithium through alloying, but repeated expansion and contraction can disrupt the electrode structure.",
+      "polarity": "achieved",
+      "attribution": "own",
+      "strength": 0.9,
+      "why": "The authors describe the scientific mechanism and its limitation.",
+      "verified": true,
+      "match_score": 1.0,
+      "span_start": 120,
+      "span_end": 228
+    },
+    {
+      "evidence_id": "E002",
+      "criterion_id": "T2.1",
+      "chunk_id": "c02",
+      "page": 2,
+      "quote": "We formulate a porous silicon-graphite composite anode with a carbon binder network.",
+      "polarity": "achieved",
+      "attribution": "own",
+      "strength": 0.95,
+      "why": "The specific material architecture is stated.",
+      "verified": true,
+      "match_score": 1.0,
+      "span_start": 410,
+      "span_end": 494
+    },
+    {
+      "evidence_id": "E003",
+      "criterion_id": "T2.2",
+      "chunk_id": "c02",
+      "page": 2,
+      "quote": "Finite-element modelling predicted that the pore network would reduce local stress during cycling.",
+      "polarity": "achieved",
+      "attribution": "own",
+      "strength": 0.85,
+      "why": "Modelling supports feasibility of the proposed structure.",
+      "verified": true,
+      "match_score": 1.0,
+      "span_start": 520,
+      "span_end": 615
+    },
+    {
+      "evidence_id": "E004",
+      "criterion_id": "T3.1",
+      "chunk_id": "c03",
+      "page": 3,
+      "quote": "The composite anode was assembled in CR2032 coin cells and cycled against lithium metal.",
+      "polarity": "achieved",
+      "attribution": "own",
+      "strength": 0.95,
+      "why": "The key electrochemical function is tested in a laboratory cell.",
+      "verified": true,
+      "match_score": 1.0,
+      "span_start": 710,
+      "span_end": 798
+    },
+    {
+      "evidence_id": "E005",
+      "criterion_id": "T3.2",
+      "chunk_id": "c04",
+      "page": 4,
+      "quote": "The cells delivered an initial reversible capacity of 1,420 mAh/g at 0.1C.",
+      "polarity": "achieved",
+      "attribution": "own",
+      "strength": 0.95,
+      "why": "A measured core-function metric is reported.",
+      "verified": true,
+      "match_score": 1.0,
+      "span_start": 900,
+      "span_end": 978
+    },
+    {
+      "evidence_id": "E006",
+      "criterion_id": "T4.2",
+      "chunk_id": "c04",
+      "page": 4,
+      "quote": "After 200 cycles at 1C, capacity retention was 82%, compared with 61% for the graphite baseline.",
+      "polarity": "achieved",
+      "attribution": "own",
+      "strength": 0.98,
+      "why": "Controlled cycling provides quantitative performance and a baseline.",
+      "verified": true,
+      "match_score": 1.0,
+      "span_start": 1010,
+      "span_end": 1104
+    },
+    {
+      "evidence_id": "E007",
+      "criterion_id": "T4.3",
+      "chunk_id": "c05",
+      "page": 5,
+      "quote": "Three independently prepared cells showed similar capacity-fade profiles over 100 cycles.",
+      "polarity": "achieved",
+      "attribution": "own",
+      "strength": 0.8,
+      "why": "Multiple cells provide limited repeatability evidence.",
+      "verified": true,
+      "match_score": 1.0,
+      "span_start": 1220,
+      "span_end": 1308
+    }
+  ],
+  "gaps": {
+    "target_trl": 5,
+    "headline": "The anode has not been tested in a scaled assembly under application-relevant conditions.",
+    "items": [
+      {
+        "criterion_id": "T5.1",
+        "missing": "Testing under elevated temperature, realistic current profiles and extended duration is absent.",
+        "why_it_matters": "These conditions determine whether laboratory cycling translates to the intended application.",
+        "actions": [
+          {
+            "step": "Cycle pouch cells at application temperature and duty-cycle profiles.",
+            "done_when": "At least 10 cells retain 80% capacity after 500 equivalent full cycles.",
+            "effort": "high",
+            "typical_duration": "6-9 months",
+            "owner": "Battery test team"
+          }
+        ],
+        "priority": 1
+      },
+      {
+        "criterion_id": "T5.2",
+        "missing": "Only coin cells are reported; a scaled pouch-cell assembly is needed.",
+        "why_it_matters": "Interfaces and heat transport can change at larger scale.",
+        "actions": [
+          {
+            "step": "Fabricate and test pouch cells using the composite anode and production-like interfaces.",
+            "done_when": "A pouch-cell batch completes formation and cycling with documented yield.",
+            "effort": "high",
+            "typical_duration": "4-6 months",
+            "owner": "Cell engineering team"
+          }
+        ],
+        "priority": 1
+      },
+      {
+        "criterion_id": "T5.3",
+        "missing": "Results are compared with a laboratory graphite baseline, not application specifications.",
+        "why_it_matters": "Deployment decisions require evidence against customer and safety requirements.",
+        "actions": [
+          {
+            "step": "Define application targets for energy density, cycle life, safety and cost, then benchmark the pouch cells.",
+            "done_when": "A requirements matrix records measured values and pass or fail status.",
+            "effort": "medium",
+            "typical_duration": "2-3 months",
+            "owner": "Systems engineering team"
+          }
+        ],
+        "priority": 2
+      }
+    ],
+    "risks": [
+      "Silicon expansion may reduce pouch-cell cycle life.",
+      "Scale-up may introduce non-uniform current density.",
+      "Thermal management may differ from coin-cell tests."
+    ],
+    "assumptions": [
+      "The intended application uses lithium-ion pouch cells.",
+      "The stated cycling protocol is representative of the target duty cycle."
+    ],
+    "roadmap": {
+      "now": ["Define requirements matrix", "Replicate the coin-cell baseline"],
+      "next": ["Build pouch-cell batch", "Run realistic thermal and duty-cycle testing"],
+      "later": ["Assess pilot manufacturing yield", "Prepare relevant-environment qualification plan"]
+    }
+  },
+  "summary": {
+    "text": "The paper demonstrates a porous silicon-graphite anode in laboratory coin cells. It reports high capacity, improved retention over graphite and limited repeat testing, supporting TRL 4. Evidence for TRL 5 is missing because the technology has not yet been tested in a scaled assembly under realistic application conditions.",
+    "key_takeaways": [
+      "The composite anode has demonstrated its core function in laboratory coin cells.",
+      "Measured cycling results outperform the stated graphite baseline.",
+      "Pouch-cell and relevant-environment testing are the main next steps."
+    ],
+    "caveats": [
+      "The example reports only three independently prepared cells.",
+      "No manufacturing yield or regulatory evidence is provided."
+    ]
+  },
+  "author_stated_trl_mentions": ["Laboratory-scale validation"],
+  "planned_items": ["Future work will evaluate pouch-cell assemblies."],
+  "flags": ["Invented example for UI development"],
+  "stats": {
+    "llm_calls": 0,
+    "cache_hits": 0,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "seconds": 0.0
+  }
+}
