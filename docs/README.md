@@ -21,3 +21,12 @@ python -m trl_scout.report.builder docs/example_assessment.json out/report.pdf
 The report is a self-contained HTML document with embedded charts. When
 WeasyPrint is installed, the same command also writes the requested PDF;
 otherwise it logs a warning and leaves the HTML beside the requested path.
+
+Start the local API with:
+
+```text
+make run-api
+```
+
+It exposes `/docs`, asynchronous assessment status and SSE progress events,
+plus run-scoped assessment and report downloads.

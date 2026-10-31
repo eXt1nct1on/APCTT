@@ -195,9 +195,10 @@ def assess(
     settings: Settings = default_settings,
     llm: LLMClient | Callable[..., Any] | None = None,
     progress: Callable[[ProgressEvent], None] | None = None,
+    run_id: str | None = None,
 ) -> Assessment:
     """Run every assessment stage and return a persisted, failure-tolerant assessment."""
-    run_id = uuid4().hex
+    run_id = run_id or uuid4().hex
     run_dir = Path(settings.data_dir) / "runs" / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
     configure_logging(run_id, settings.data_dir)
