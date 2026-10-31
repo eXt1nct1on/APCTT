@@ -11,6 +11,8 @@ build/
 dist/
 *.egg-info/
 data/
+!data/
+data/*
+!data/rubric.yaml
 *.pdf
 !tests/fixtures/*.pdf
-
