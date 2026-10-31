@@ -1,0 +1,9 @@
+Executive Summary
+This invented report describes a membrane water-treatment pilot plant.
+
+Test Results
+The pilot assembly operated continuously under realistic flow and contaminant conditions.
+Performance was measured against application specifications over a sustained test.
+
+Conclusion
+The pilot-scale system is ready for further qualification.

@@ -1,0 +1,12 @@
+Abstract
+This invented paper describes a porous silicon-graphite battery anode for high-energy cells.
+
+Introduction
+Silicon stores lithium through alloying and the composite concept is intended to limit expansion.
+
+Results
+The composite anode was assembled in laboratory coin cells. Measured capacity reached 1,420 mAh/g,
+and three cells showed similar capacity-fade profiles over repeated cycling.
+
+Conclusion
+Future work will evaluate pouch-cell assemblies. The document does not claim a field trial.

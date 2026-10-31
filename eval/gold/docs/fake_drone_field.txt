@@ -1,0 +1,9 @@
+Abstract
+This invented paper describes an autonomous inspection drone.
+
+Field Trial
+Real operators used the system in the operational environment and collected flight performance data.
+The prototype completed field missions with operational issues recorded for design revisions.
+
+Conclusion
+The system was demonstrated with real users in service.

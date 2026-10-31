@@ -27,7 +27,8 @@ run-ui:
 	$(PYTHON) -m streamlit run app/streamlit_app.py
 
 eval:
-	$(PYTHON) -m pytest tests -m live
+	$(PYTHON) -m eval.run_eval --mode full --mock
+	$(PYTHON) -m eval.compare eval/results
 
 clean:
 	rm -rf .pytest_cache .ruff_cache build dist *.egg-info

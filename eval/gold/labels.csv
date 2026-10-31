@@ -1,0 +1,4 @@
+doc_id,filename,source_url,doc_type,domain,gold_trl,gold_low,gold_high,labeler_a,labeler_b,notes
+fake-battery-001,fake_battery_paper.txt,,paper,energy storage,4,4,5,4,4,"Invented laboratory battery example; coin-cell evidence only."
+fake-water-002,fake_water_pilot.txt,,report,water treatment,6,5,6,6,5,"Invented pilot-scale membrane demonstration."
+fake-drone-003,fake_drone_field.txt,,paper,aerospace,7,6,7,7,7,"Invented field trial with operators and operational data."
