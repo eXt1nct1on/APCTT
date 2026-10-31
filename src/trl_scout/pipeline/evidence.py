@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import logging
 from collections import defaultdict
+from collections.abc import Callable
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -15,7 +17,9 @@ from trl_scout.llm.client import FakeLLM, LLMClient, gather_limited, load_prompt
 from trl_scout.pipeline.identify import identify_technology
 from trl_scout.pipeline.verify import explicit_trl_mentions, planned_items, quote_span
 from trl_scout.rubric import Level, load_rubric
-from trl_scout.schemas import CriterionResult, Document, EvidenceItem, TechProfile
+from trl_scout.schemas import CriterionResult, Document, EvidenceItem, ProgressEvent, TechProfile
+
+logger = logging.getLogger("trl_scout.pipeline.evidence")
 
 
 class RawEvidence(BaseModel):
@@ -82,10 +86,12 @@ def _evaluate_level(
     document: Document,
     tech: TechProfile,
     level: Level,
-    index: DocIndex,
+    index: DocIndex | None,
     llm: LLMClient,
 ) -> tuple[list[CriterionResult], list[EvidenceItem]]:
     """Evaluate one level and verify every proposed quote."""
+    if index is None:
+        raise RuntimeError("retrieval index is unavailable")
     passages = index.retrieve_for_level(level, k=8)
     system, user = _build_level_prompt(tech, document, level, passages)
     raw = llm.complete_json(system, user, RawLevel, max_tokens=3000)
@@ -148,14 +154,56 @@ async def assess_evidence_async(
     document: Document,
     tech: TechProfile,
     llm: LLMClient,
-    index: DocIndex,
+    index: DocIndex | None,
+    progress: Callable[[ProgressEvent], None] | None = None,
+    failure_flags: list[str] | None = None,
 ) -> tuple[list[CriterionResult], list[EvidenceItem]]:
     """Assess all rubric levels concurrently with the configured LLM limit."""
+    levels = load_rubric().levels
+
+    async def evaluate(level: Level) -> tuple[list[CriterionResult], list[EvidenceItem]]:
+        """Evaluate one level without allowing its failure to cancel siblings."""
+        if progress is not None:
+            progress(
+                ProgressEvent(
+                    step="evidence",
+                    status="started",
+                    detail=f"Assessing TRL {level.level}.",
+                    pct=0,
+                )
+            )
+        try:
+            result = await asyncio.to_thread(_evaluate_level, document, tech, level, index, llm)
+        except Exception as exc:
+            if failure_flags is not None:
+                failure_flags.append(f"level_{level.level}_failed")
+            logger.exception("Evidence assessment failed for level %s", level.level)
+            result = (
+                [
+                    CriterionResult(
+                        criterion_id=criterion.id,
+                        status="unknown",
+                        evidence_ids=[],
+                        score=0,
+                        note=f"Level assessment failed: {exc}",
+                    )
+                    for criterion in level.criteria
+                ],
+                [],
+            )
+        if progress is not None:
+            progress(
+                ProgressEvent(
+                    step="evidence",
+                    status="completed",
+                    detail=f"TRL {level.level} assessment complete.",
+                    pct=0,
+                )
+            )
+        return result
+
     results = await gather_limited(
-        [
-            asyncio.to_thread(_evaluate_level, document, tech, level, index, llm)
-            for level in load_rubric().levels
-        ]
+        [evaluate(level) for level in levels]
     )
     criteria = [criterion for level_result, _ in results for criterion in level_result]
     evidence = [item for _, level_evidence in results for item in level_evidence]
@@ -178,10 +226,21 @@ def assess_evidence(
     document: Document,
     tech: TechProfile,
     llm: LLMClient,
-    index: DocIndex,
+    index: DocIndex | None,
+    progress: Callable[[ProgressEvent], None] | None = None,
+    failure_flags: list[str] | None = None,
 ) -> tuple[list[CriterionResult], list[EvidenceItem]]:
     """Synchronous entry point for evidence assessment."""
-    return asyncio.run(assess_evidence_async(document, tech, llm, index))
+    return asyncio.run(
+        assess_evidence_async(
+            document,
+            tech,
+            llm,
+            index,
+            progress=progress,
+            failure_flags=failure_flags,
+        )
+    )
 
 
 def main() -> None:

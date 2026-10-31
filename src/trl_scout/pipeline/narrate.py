@@ -26,8 +26,16 @@ class RawSummary(BaseModel):
 
 def _compact_json(assessment: Any) -> str:
     """Serialize only compact structured assessment data, never source text."""
-    if hasattr(assessment, "model_dump"):
-        assessment = assessment.model_dump(mode="json")
+    def convert(value: Any) -> Any:
+        if hasattr(value, "model_dump"):
+            return convert(value.model_dump(mode="json"))
+        if isinstance(value, dict):
+            return {key: convert(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [convert(item) for item in value]
+        return value
+
+    assessment = convert(assessment)
     if not isinstance(assessment, dict):
         raise TypeError("assessment must be a mapping or Pydantic model")
     compact = {
