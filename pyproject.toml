@@ -20,6 +20,7 @@ dependencies = [
     "pydantic>=2.6,<3",
     "pydantic-settings>=2.2,<3",
     "PyYAML>=6,<7",
+    "beautifulsoup4>=4.12,<5",
     "fastapi>=0.110,<1",
     "sse-starlette>=2,<3",
     "uvicorn[standard]>=0.29,<1",
@@ -29,12 +30,14 @@ dependencies = [
     "weasyprint>=61,<70",
     "matplotlib>=3.8,<4",
     "pandas>=2.2,<3",
+    "requests>=2.31,<3",
     "scikit-learn>=1.4,<2",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8,<9",
+    "reportlab>=4,<5",
     "ruff>=0.4,<1",
 ]
 
