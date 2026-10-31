@@ -25,6 +25,19 @@ POLARITY_COLOURS = {
     "background": "#647779",
 }
 
+
+def _has_provider_key() -> bool:
+    """Return whether a configured hosted LLM provider key is available."""
+    return any(
+        (
+            settings.gemini_api_key,
+            settings.groq_api_key,
+            settings.openrouter_api_key,
+            settings.openai_api_key,
+        )
+    )
+
+
 st.set_page_config(
     page_title="TRL-Scout",
     page_icon="🔬",
@@ -309,7 +322,9 @@ def main() -> None:
     st.caption("Evidence-grounded technology readiness assessment")
     with st.sidebar:
         st.header("Source")
-        demo_mode = st.toggle("Demo mode", value=False)
+        demo_mode = st.toggle("Demo mode", value=not _has_provider_key())
+        if not _has_provider_key():
+            st.caption("No hosted LLM key detected; demo mode is enabled by default.")
         if demo_mode:
             st.info("Using the bundled battery example. No LLM calls are made.")
             if "assessment" not in st.session_state or not st.session_state.assessment.is_example:
