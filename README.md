@@ -60,13 +60,7 @@ Python 3.11, FastAPI, Streamlit, Pydantic, PyMuPDF, pdfplumber, Tesseract,
 spaCy, BM25, sentence-transformers, LiteLLM, Jinja2, WeasyPrint, and
 matplotlib.
 
-## Team
 
-Techfest IIT Bombay AI/ML Hackathon project.
-
-## Licence
-
-Licence information will be added by the project owners before public release.
 
 See [deployment instructions](docs/deploy.md) and the detailed
 [project documentation](docs/README.md).
